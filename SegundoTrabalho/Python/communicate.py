@@ -37,7 +37,7 @@ class Communicate():
         else:
             pass
 
-    def send_int_to_uart(self, value: int, num_bytes = 4, byteorder = "little") -> None:
+    def send_int_to_uart(self, value: int, num_bytes = 1, byteorder = "little") -> None:
         '''
         Método para fazer o envio de dados para o microcontrolador via UART.
         :param int value: informação a ser enviada.
@@ -46,12 +46,11 @@ class Communicate():
         '''
         # Converte o valor inteiro em bytes
         bytes_to_send = value.to_bytes(num_bytes, byteorder, signed=False)
-        
         # Envia os bytes pela porta serial
         try:
             self._serial_port.write(bytes_to_send)
             print(f"Amostra {value} enviado com sucesso!")
-            sleep(0.3)
+            sleep(1)
         except:
             print("Falha ao enviar os dados!")
 

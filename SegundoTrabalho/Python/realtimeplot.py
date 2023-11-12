@@ -39,6 +39,10 @@ class RealTimePlot():
         :param list signal: sinal que deve ser reenviado
         '''
         self._signal = signal
+
+    def sendSignal(self):
+        for signal in self._signal:
+            self._communicate.send_int_to_uart(signal)
         
     def _update(self, fig) -> None:
         print("Teste 3")

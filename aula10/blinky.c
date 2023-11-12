@@ -14,10 +14,10 @@
 #include "driverlib/udma.h"                                                                             // Inclui a biblioteca de DMA
 
 #define SAMPLE_RATE 12000                                                                               // Define a frequencia de amostragem desejada
-#define BUFFER_LENGHT 1024                                                                              // Define o tamanho do buffer (12000/2400 = 200ms)
+//#define BUFFER_LENGHT 1024                                                                              // Define o tamanho do buffer (12000/2400 = 200ms)
 
-#pragma DATA_ALIGN(pu8ControlTable, 1024);                                                              // Diretiva de compilação para a DMA
-uint8_t pu8ControlTable[1024];                                                                          // Enderecos de memoria para configuracao da DMA
+//#pragma DATA_ALIGN(pu8ControlTable, 1024);                                                              // Diretiva de compilação para a DMA
+//uint8_t pu8ControlTable[1024];                                                                          // Enderecos de memoria para configuracao da DMA
 
 
 uint16_t bufferADC[BUFFER_LENGHT];                                                                      // Buffer para armazenar as leituras do ADC
@@ -48,40 +48,40 @@ int main(void)
     | SYSCTL_USE_PLL | SYSCTL_CFG_VCO_480), 120000000);                                                          // Define o clock do sistema (clock interno, 120 MHz)
 
 
-    // ------------------------------------------ Configura a UART -----------------------------------------
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
-    while(!SysCtlPeripheralReady(SYSCTL_PERIPH_UART0)){ }
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
-    while(!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOA)){ }
-    GPIOPinConfigure(GPIO_PA0_U0RX);
-    GPIOPinConfigure(GPIO_PA1_U0TX);
-    GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPION);
-    GPIOPinTypeGPIOOutput(GPIO_PORTN_BASE, GPIO_PIN_0 | GPIO_PIN_1);
-    UARTConfigSetExpClk(
-            UART0_BASE, systemClock, 115200,
-            (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE | UART_CONFIG_PAR_NONE));
-
-
-    // ------------------------------------------ Configura a DMA -----------------------------------------
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_UDMA);
-    while(!SysCtlPeripheralReady(SYSCTL_PERIPH_UDMA)){ }
-    uDMAEnable();
-    uDMAControlBaseSet(pu8ControlTable);
-    uDMAChannelAttributeDisable(UDMA_CHANNEL_ADC3,
-                                    UDMA_ATTR_ALTSELECT | UDMA_ATTR_HIGH_PRIORITY |
-                                    UDMA_ATTR_REQMASK);
-    uDMAChannelControlSet(UDMA_CHANNEL_ADC3,  UDMA_SIZE_16 | UDMA_SRC_INC_NONE |
-                          UDMA_DST_INC_16 | UDMA_ARB_1);                                                  // Configura o canal da DMA
-    uDMAChannelTransferSet(UDMA_CHANNEL_ADC3,
-                           UDMA_MODE_BASIC,
-                           (void *)(ADC0_BASE + ADC_O_SSFIFO3),
-                           bufferADC,
-                           BUFFER_LENGHT);
-
-    uDMAChannelAttributeEnable(UDMA_CHANNEL_ADC3, UDMA_ATTR_USEBURST);
-    uDMAChannelEnable(UDMA_CHANNEL_ADC3 | UDMA_PRI_SELECT);
-    SysCtlDelay(10);
+//    // ------------------------------------------ Configura a UART -----------------------------------------
+//    SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
+//    while(!SysCtlPeripheralReady(SYSCTL_PERIPH_UART0)){ }
+//    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
+//    while(!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOA)){ }
+//    GPIOPinConfigure(GPIO_PA0_U0RX);
+//    GPIOPinConfigure(GPIO_PA1_U0TX);
+//    GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
+//    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPION);
+//    GPIOPinTypeGPIOOutput(GPIO_PORTN_BASE, GPIO_PIN_0 | GPIO_PIN_1);
+//    UARTConfigSetExpClk(
+//            UART0_BASE, systemClock, 115200,
+//            (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE | UART_CONFIG_PAR_NONE));
+//
+//
+//    // ------------------------------------------ Configura a DMA -----------------------------------------
+//    SysCtlPeripheralEnable(SYSCTL_PERIPH_UDMA);
+//    while(!SysCtlPeripheralReady(SYSCTL_PERIPH_UDMA)){ }
+//    uDMAEnable();
+//    uDMAControlBaseSet(pu8ControlTable);
+//    uDMAChannelAttributeDisable(UDMA_CHANNEL_ADC3,
+//                                    UDMA_ATTR_ALTSELECT | UDMA_ATTR_HIGH_PRIORITY |
+//                                    UDMA_ATTR_REQMASK);
+//    uDMAChannelControlSet(UDMA_CHANNEL_ADC3,  UDMA_SIZE_16 | UDMA_SRC_INC_NONE |
+//                          UDMA_DST_INC_16 | UDMA_ARB_1);                                                  // Configura o canal da DMA
+//    uDMAChannelTransferSet(UDMA_CHANNEL_ADC3,
+//                           UDMA_MODE_BASIC,
+//                           (void *)(ADC0_BASE + ADC_O_SSFIFO3),
+//                           bufferADC,
+//                           BUFFER_LENGHT);
+//
+//    uDMAChannelAttributeEnable(UDMA_CHANNEL_ADC3, UDMA_ATTR_USEBURST);
+//    uDMAChannelEnable(UDMA_CHANNEL_ADC3 | UDMA_PRI_SELECT);
+//    SysCtlDelay(10);
 
 
         // ------------------------------------------ Configura o ADC -----------------------------------------
