@@ -14,12 +14,23 @@
 #include "driverlib/udma.h"                                                                             // Inclui a biblioteca de DMA
 #include "driverlib/pwm.h"                                                                              // Inclui a biblioteca de PWM
 
-#define SIGNAL_LENGHT 112
+#define SIGNAL_LENGTH 112
 
-uint16_t freq_pwm = 2000;
-uint32_t SystemClockFreq, SystemClockPeriod;
+uint32_t freq_pwm = 32000;
+uint32_t SystemClockFreq;
+float SystemClockPeriod;
 uint8_t i = 0, flagChangeDuty = 0;
-uint8_t duty[SIGNAL_LENGHT];
+uint8_t duty[SIGNAL_LENGTH];
+
+// Interrupção para alterar o valor de pwm
+void Timer0IntHandler(void)
+{
+    // Clear the timer interrupt
+    TimerIntClear(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
+    PWMPulseWidthSet(PWM0_BASE, PWM_OUT_1, ((SystemClockFreq/freq_pwm)*25*duty[i])/100);
+    i = i + 1;                                                                                                      // Incrementa i
+    i = i % 112;                                                                                                    // Faz o buffer circular
+}
 
 int main(void)
 {
@@ -27,7 +38,7 @@ int main(void)
     | SYSCTL_USE_PLL | SYSCTL_CFG_VCO_480), 120000000);                                                          // Define o clock do sistema (clock interno, 120 MHz)
 
     SystemClockFreq = SysCtlClockGet();                                                                         // Recebe a frequencia do clock interno
-    // SystemClockPeriod = 1/SystemClockFreq;                                                                   // Calcula o periodo do clock
+    SystemClockPeriod = 1/SystemClockFreq;                                                                      // Calcula o periodo do clock
 
 
     // ------------------------------------------ Configura a UART -----------------------------------------
@@ -52,38 +63,40 @@ int main(void)
     SysCtlPeripheralEnable(SYSCTL_PERIPH_PWM0);                                                                 // Habilita o periferico de pwm
     while(!SysCtlPeripheralReady(SYSCTL_PERIPH_PWM0));                                                          // Verifica e espera ate habilitar o PWM1
     PWMGenConfigure(PWM0_BASE, PWM_GEN_0, PWM_GEN_MODE_DOWN | PWM_GEN_MODE_NO_SYNC);                            // Configura o modulo 0, gerador de PWM 0, para trabalhar no modo dowm
-    PWMGenPeriodSet(PWM0_BASE, PWM_GEN_0, SystemClockFreq/freq_pwm);                                            // Configura o periodo do PWM (LOAD = SystemClockFreq/freq_pwm)
-    PWMPulseWidthSet(PWM0_BASE, PWM_OUT_1, ((SystemClockFreq/freq_pwm)*50)/100);                                // Coloca o DutyCycle de 0.50
+    PWMGenPeriodSet(PWM0_BASE, PWM_GEN_0, 25*SystemClockFreq/freq_pwm);                                            // Configura o periodo do PWM (LOAD = SystemClockFreq/freq_pwm)
+    uint32_t ui32MyDuty = 25*((SystemClockFreq/freq_pwm)*50.0)/(100.0);
+    PWMPulseWidthSet(PWM0_BASE, PWM_OUT_1, ui32MyDuty);                                // Coloca o DutyCycle de 0.50/
     PWMGenEnable(PWM0_BASE, PWM_GEN_0);                                                                         // Habilita o Timer do gerador 0
     PWMOutputState(PWM0_BASE, PWM_OUT_1_BIT, true);                                                             // Habilita a saida do pwm
 
 
 
-    while(i < SIGNAL_LENGHT){
+    // ------------------------------------------ RECEBE O SINAL ------------------------------------------
+    while(i < SIGNAL_LENGTH){
         if (UARTCharsAvail(UART0_BASE)){
             duty[i] = UARTCharGet(UART0_BASE);
-            PWMPulseWidthSet(PWM0_BASE, PWM_OUT_1, ((SystemClockFreq/freq_pwm)*duty[i])/100);
+            PWMPulseWidthSet(PWM0_BASE, PWM_OUT_1, ((SystemClockFreq/freq_pwm)*25*duty[i])/100);
             i = i+1;
         }
     }
+    i = 0;
+
+    // ------------------------------------ CONFIGURA TIMER/INTERRUPT -------------------------------------
+    uint16_t ui16SignalFreq = 500;                                                                              // Frequencia do sinal recebido
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER0);                                                               // Habilita o periferico de timer
+    TimerConfigure(TIMER0_BASE, TIMER_CFG_PERIODIC);                                                            // Configura o timer como periodico
+    uint32_t ui32Period = SystemClockFreq/(ui16SignalFreq * SIGNAL_LENGTH);                                     // Calculo do contador da interrupcao
+    TimerLoadSet(TIMER0_BASE, TIMER_A, ui32Period -1);                                                          // Configura o contador da interrupcao
+    IntEnable(INT_TIMER0A);                                                                                     //
+    TimerIntEnable(TIMER0_BASE, TIMER_TIMA_TIMEOUT);                                                            //
+    IntMasterEnable();                                                                                          //
+    TimerEnable(TIMER0_BASE, TIMER_A);                                                                          //
 
     while(1){
-        UARTCharPut(UART0_BASE, "o");
-        UARTCharPut(UART0_BASE, "k");
-        UARTCharPut(UART0_BASE, "\n");
-    }
-}
-
-
-// Interrupção para alterar o valor de pwm
-void TimerIntHandler(){
-    if(flagChangeDuty == 1){
-        flagChangeDuty = 0;
-        PWMPulseWidthSet(PWM0_BASE, PWM_OUT_1, (SystemClockFreq/freq_pwm*duty[i])/100);
 
     }
+
 }
 
-// COLOCAR A UART E O TIMER DEPOIS
 
 
