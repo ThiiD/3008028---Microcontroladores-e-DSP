@@ -1,0 +1,7 @@
+"./main.obj"
+"./startup_ccs.obj"
+"./drivers/pinout.obj"
+"./utils/uart_utils.obj"
+"../main.cmd"
+-l"C:/ti/TivaWare_C_Series-2.2.0.295/driverlib/ccs/Debug/driverlib.lib"
+-llibc.a

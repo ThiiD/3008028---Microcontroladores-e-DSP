@@ -21,7 +21,7 @@ uint8_t pu8ControlTable[1024];                                                  
 
 
 uint16_t bufferADC[BUFFER_LENGHT];                                                                      // Buffer para armazenar as leituras do ADC
-volatile uint16_t flag = 0;                                                                                      // Flag para buffer verificar o preenchimento do buffer
+volatile uint16_t flag = 0;                                                                             // Flag para buffer verificar o preenchimento do buffer
 volatile uint16_t teste = 0;
 //void sendInt(int dado);
 //void ADCIntHandler();
@@ -85,18 +85,18 @@ int main(void)
 
 
         // ------------------------------------------ Configura o ADC -----------------------------------------
-        SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE); // Habilita o GPIO E
+        SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);                                                          // Habilita o GPIO E
         while(!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOE)){ }
-        GPIOPinTypeADC(GPIO_PORTE_BASE, GPIO_PIN_3); // Configura o pino E3 como ADC
+        GPIOPinTypeADC(GPIO_PORTE_BASE, GPIO_PIN_3);                                                          // Configura o pino E3 como ADC
 
-        SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC0); // Habilita o ADC0
+        SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC0);                                                           // Habilita o ADC0
         while(!SysCtlPeripheralReady(SYSCTL_PERIPH_ADC0)){ }
         IntDisable(INT_ADC0SS3);
         ADCIntDisable(ADC0_BASE, 3);
         ADCSequenceDisable(ADC0_BASE, 3);
         ADCSequenceConfigure(ADC0_BASE, 3, ADC_TRIGGER_TIMER, 0);                                             // Configura o ADC para ter o Sample Sequencer 3 (1 medicao) com trigger por timer e prioridade 0                                                   // Liga o timer a entrada de trigger do adc
         ADCSequenceStepConfigure(ADC0_BASE, 3, 0, ADC_CTL_CH0 | ADC_CTL_IE | ADC_CTL_END);                    // Configura a leitura do canal 0 e habilita interrupcao de termino de leitura ao final.
-        ADCSequenceEnable(ADC0_BASE, 3);     // Habilita a sequencia 3 no ADC0
+        ADCSequenceEnable(ADC0_BASE, 3);                                                                      // Habilita a sequencia 3 no ADC0
         ADCIntClear(ADC0_BASE, 3);
         ADCSequenceDMAEnable(ADC0_BASE, 3);
         ADCIntEnable(ADC0_BASE, 3);

@@ -1,0 +1,5 @@
+Plotted to 'C:\Users\guilh\OneDrive\Conteudo Docente\Pos graduação\Microcontroladores e DSPs\PCBs\Inversor\Inversor-F_Cu.gbr'.
+Plotted to 'C:\Users\guilh\OneDrive\Conteudo Docente\Pos graduação\Microcontroladores e DSPs\PCBs\Inversor\Inversor-B_Cu.gbr'.
+Plotted to 'C:\Users\guilh\OneDrive\Conteudo Docente\Pos graduação\Microcontroladores e DSPs\PCBs\Inversor\Inversor-Edge_Cuts.gbr'.
+Arquivo de trabalho do Gerber 'C:\Users\guilh\OneDrive\Conteudo Docente\Pos graduação\Microcontroladores e DSPs\PCBs\Inversor\Inversor-job.gbrjob' foi criado.
+Informação: Feito.
